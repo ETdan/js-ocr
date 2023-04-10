@@ -14,12 +14,12 @@ app.use(express.static("public"))
 
 
 // multer(to collect and store image from form to public/image) set up
+const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
 const storage=multer.diskStorage({
   destination:(req,file,cb)=>{
       cb(null,'./public/image/')
   },
   filename:(req,file,cb)=>{
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
     cb(null, uniqueSuffix + '-' + file.originalname)
   }
 })
@@ -41,10 +41,11 @@ app.get('/',(req,res)=>{
 app.post('/',upload.single('file'),(req,res)=>{
 
     tesseract.recognize(
-      'https://tesseract.projectnaptha.com/img/eng_bw.png',
+      // 'https://tesseract.projectnaptha.com/img/eng_bw.png', //test image
+      `public/image/${uniqueSuffix + '-' + req.file.originalname}`,
       'eng'
     ).then(({data:{text}}) => {
-      res.render('index',{post:text});
+      res.render('post',{post:text});
     })
 })
 
